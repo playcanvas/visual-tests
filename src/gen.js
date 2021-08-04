@@ -44,7 +44,7 @@ const spawnPuppeteer = (port, doneCallback) => {
     }).then(async (browser) => {
         const page = await browser.newPage();
         // page.on('console', (message) => {
-            // console.log(`> ${message.text()}`);
+        //     console.log(`> ${message.text()}`);
         // });
         await page.goto(`http://localhost:${port}/index.html`);
         await page.waitForSelector('#visual-regression-complete', {

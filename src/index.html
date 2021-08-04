@@ -21,24 +21,23 @@
 
     <!-- The script -->
     <script>
-
         // get a browser string
-        // taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
         const browser = (() => {
-            // firefox
-            if (typeof InstallTrigger !== 'undefined') {
-                return 'firefox'
+            const ua = navigator.userAgent;
+
+            if (ua.indexOf("Chrome") != -1) {
+                return 'chrome';
             }
 
-            // safari
-            if (/constructor/i.test(window.HTMLElement) ||
-                (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] ||
-                (typeof safari !== 'undefined' && window['safari'].pushNotification))) {
+            if (ua.indexOf("Safari") != -1) {
                 return 'safari';
             }
 
-            // chrome
-            return !!window.chrome ? 'chrome' : 'unknown';
+            if (ua.indexOf("Firefox") != -1) {
+                return 'firefox';
+            }
+
+            return 'unknown';
         })();
 
         const run = (modelIndex) => {
