@@ -7,7 +7,7 @@ Generate screenshots of GLTF models and compare them across engine releases and/
 git clone https://github.sc-corp.net/PlayCanvas/gltf-test.git
 cd gltf-test
 npm install
-https://github.com/KhronosGroup/glTF-Sample-Models.git
+git clone https://github.com/KhronosGroup/glTF-Sample-Models.git
 ```
 
 ### Running
