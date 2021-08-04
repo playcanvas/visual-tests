@@ -45,17 +45,12 @@
             // load and initialize draco
             const canvas = document.getElementById("application-canvas");
 
-            // Create the app and start the update loop
+            // create the app and start the update loop
             const app = new pc.Application(canvas);
             const device = app.graphicsDevice;
 
-            // Set the canvas to fill the window and automatically change resolution to be the same as the canvas size
-            app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
-            app.setCanvasResolution(pc.RESOLUTION_AUTO);
-
-            window.addEventListener("resize", function () {
-                app.resizeCanvas(canvas.width, canvas.height);
-            });
+            // fix canvas resolution
+            app.setCanvasResolution(pc.RESOLUTION_FIXED, 800, 600);
 
             // create the camera
             const camera = new pc.Entity();

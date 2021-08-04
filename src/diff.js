@@ -69,6 +69,7 @@ class ImageDb {
     constructor() {
         this.tree = { };
         this.keys = { };
+        this.tree2 = { };
     }
 
     addFile(pathname) {
@@ -78,6 +79,11 @@ class ImageDb {
             Helpers.add(this.tree, [key.model, key.browser, hash], [ ]).push(pathname);
             Helpers.add(this.keys, ['models', key.model], 1);
             Helpers.add(this.keys, ['browsers', key.browser], 1);
+            Helpers.add(this.keys, ['engines', key.engine], 1);
+            Helpers.add(this.tree2, [key.model, key.browser, key.variant, key.engine], {
+                hash: hash,
+                pathname: pathname
+            });
         }
     }
 
@@ -100,6 +106,7 @@ class ImageDb {
     genReport(visitor) {
         const models = Object.keys(this.keys.models).sort();
         const browsers = Object.keys(this.keys.browsers).sort();
+        const engines = Object.keys(this.keys.engines).sort();
 
         visitor.init(models, browsers);
 
@@ -110,10 +117,34 @@ class ImageDb {
         }
 
         visitor.done();
-    }
 
-    logErrors(visitor) {
-        
+        // check for errors
+        for (const [model, browsers] of Object.entries(this.tree2)) {
+            for (const [browser, variants] of Object.entries(browsers)) {
+                for (const [variant, enginesPresent] of Object.entries(variants)) {
+                    // check if any screenshots are missing
+                    engines.forEach((engine) => {
+                        if (!enginesPresent.hasOwnProperty(engine)) {
+                            visitor.error(`missing model=${model} browser=${browser} variant=${variant} engine=${engine}`);
+                        }
+                    });
+
+                    // check if screenshots match
+                    const enginesPresentKeys = Object.keys(enginesPresent).sort();
+                    const entry0 = enginesPresent[enginesPresentKeys[0]];
+                    for (let i = 1; i < enginesPresentKeys.length; ++i) {
+                        const entryI = enginesPresent[enginesPresentKeys[i]];
+                        if (entryI.hash !== entry0.hash) {
+                            const diffText = imageDiff(PNG.sync.read(fs.readFileSync(entry0.pathname)),
+                                                       PNG.sync.read(fs.readFileSync(entryI.pathname)));
+                            if (diffText) {
+                                visitor.error(`${diffText} ${entry0.pathname} ${entryI.pathname}`);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -220,6 +251,10 @@ class ReportVisitor {
         this.put(value);
         this.close(tag);
     }
+
+    error(msg) {
+        console.error(msg);
+    }
 }
 
 class LogVisitor {
@@ -232,7 +267,6 @@ if (process.argv.length >= 5) {
         imageDb.addDirectory(process.argv[i]);
     }
     imageDb.genReport(new ReportVisitor(process.argv[2]));
-    imageDb.logErrors(new LogVisitor());
 } else {
     console.error('specify arguments: outputFilename dir1 dir2 ...');
 }
