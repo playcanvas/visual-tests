@@ -108,17 +108,18 @@ class ImageDb {
         const browsers = Object.keys(this.keys.browsers).sort();
         const engines = Object.keys(this.keys.engines).sort();
 
+        // render the report
         visitor.init(models, browsers);
-
         for (let m = 0; m < models.length; ++m) {
             for (let b = 0; b < browsers.length; ++b) {
                 visitor.entry(m, b, this.tree[models[m]][browsers[b]]);
             }
         }
-
         visitor.done();
 
-        // check for errors
+        let returnCode = 0;
+
+        // check for missing screenshots or mismatched
         for (const [model, browsers] of Object.entries(this.tree2)) {
             for (const [browser, variants] of Object.entries(browsers)) {
                 for (const [variant, enginesPresent] of Object.entries(variants)) {
@@ -126,6 +127,7 @@ class ImageDb {
                     engines.forEach((engine) => {
                         if (!enginesPresent.hasOwnProperty(engine)) {
                             visitor.error(`missing model=${model} browser=${browser} variant=${variant} engine=${engine}`);
+                            returnCode = 1;
                         }
                     });
 
@@ -139,12 +141,15 @@ class ImageDb {
                                                        PNG.sync.read(fs.readFileSync(entryI.pathname)));
                             if (diffText) {
                                 visitor.error(`${diffText} ${entry0.pathname} ${entryI.pathname}`);
+                                returnCode = 1;
                             }
                         }
                     }
                 }
             }
         }
+
+        return returnCode;
     }
 }
 
@@ -257,16 +262,13 @@ class ReportVisitor {
     }
 }
 
-class LogVisitor {
-
-}
-
 if (process.argv.length >= 5) {
     const imageDb = new ImageDb();
     for (let i = 3; i < process.argv.length; ++i) {
         imageDb.addDirectory(process.argv[i]);
     }
-    imageDb.genReport(new ReportVisitor(process.argv[2]));
+    const exitCode = imageDb.genReport(new ReportVisitor(process.argv[2]));
+    process.exit(exitCode);
 } else {
     console.error('specify arguments: outputFilename dir1 dir2 ...');
 }
