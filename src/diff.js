@@ -194,6 +194,8 @@ class ReportVisitor {
 
         this.close(`body`);
         this.close(`html`);
+
+        // write the output file
         fs.writeFileSync(this.outputPathname, this.html.join('\n'), 'utf8');
     }
 

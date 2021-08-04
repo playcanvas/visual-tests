@@ -185,9 +185,7 @@
 
         // load and initialize draco
         const moduleName = 'DracoDecoderModule';
-        const lib = window[moduleName];
-        window[moduleName + 'Lib'] = lib;
-        lib({
+        window[moduleName]({
             locateFile: () => 'draco/draco.wasm.wasm'
         }).then((instance) => {
             window[moduleName] = instance;

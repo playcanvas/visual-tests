@@ -1,0 +1,4 @@
+.gitignore
+node_modules/
+screenshots/
+glTF-Sample-Models/
