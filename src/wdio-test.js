@@ -21,7 +21,7 @@ it('gltf-test', async () => {
     const port = process.env.GLTF_PORT || 8080;
 
     await browser.setWindowSize(800 + dressingWidth, 600 + dressingHeight);
-    await browser.url(`http://localhost:${port}/index.html?browser=${browserName}`);
+    await browser.url(`http://localhost:${port}/index.html`);
     const element = await $('#visual-regression-complete');
     await element.waitForExist({ timeout: 1000 * 60 * 5 });
 });

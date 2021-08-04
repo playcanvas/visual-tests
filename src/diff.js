@@ -4,7 +4,7 @@ const PNG = require('pngjs').PNG;
 const crypto = require('crypto');
 
 class Helpers {
-    // given a path to a screenshot, extract the model, browser, engine and format
+    // extract from a screenshot image path its model, browser, engine and format
     static extractKey = (pathname) => {
         const bits = pathname.split('/').reverse();
         return bits[0] === '.DS_Store' ? null : {
@@ -15,7 +15,7 @@ class Helpers {
         };
     }
 
-    // add a value (if it doesn't already exist) to the tree at the given tree path
+    // add a value if it doesn't already exist to the tree at the given path
     static add(tree, path, value) {
         path.forEach((p, i) => {
             if (!tree.hasOwnProperty(p)) {
@@ -110,6 +110,10 @@ class ImageDb {
         }
 
         visitor.done();
+    }
+
+    logErrors(visitor) {
+        
     }
 }
 
@@ -218,11 +222,17 @@ class ReportVisitor {
     }
 }
 
-if (process.argv.length === 5) {
+class LogVisitor {
+
+}
+
+if (process.argv.length >= 5) {
     const imageDb = new ImageDb();
-    imageDb.addDirectory(process.argv[2]);
-    imageDb.addDirectory(process.argv[3]);
-    imageDb.genReport(new ReportVisitor(process.argv[4]));
+    for (let i = 3; i < process.argv.length; ++i) {
+        imageDb.addDirectory(process.argv[i]);
+    }
+    imageDb.genReport(new ReportVisitor(process.argv[2]));
+    imageDb.logErrors(new LogVisitor());
 } else {
-    console.error('specify arguments: dir1 dir2 [outputFilename]');
+    console.error('specify arguments: outputFilename dir1 dir2 ...');
 }

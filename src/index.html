@@ -21,6 +21,26 @@
 
     <!-- The script -->
     <script>
+
+        // get a browser string
+        // taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
+        const browser = (() => {
+            // firefox
+            if (typeof InstallTrigger !== 'undefined') {
+                return 'firefox'
+            }
+
+            // safari
+            if (/constructor/i.test(window.HTMLElement) ||
+                (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] ||
+                (typeof safari !== 'undefined' && window['safari'].pushNotification))) {
+                return 'safari';
+            }
+
+            // chrome
+            return !!window.chrome ? 'chrome' : 'unknown';
+        })();
+
         const run = (modelIndex) => {
             // load and initialize draco
             const canvas = document.getElementById("application-canvas");
@@ -37,19 +57,6 @@
                 app.resizeCanvas(canvas.width, canvas.height);
             });
 
-            app.scene.ambientLight = new pc.Color(0.2, 0.2, 0.2);
-
-            // extract query params. taken from https://stackoverflow.com/a/21152762
-            const urlParams = {};
-            if (location.search) {
-                location.search.substr(1).split("&").forEach((item) => {
-                    const s = item.split("=");
-                    const k = s[0];
-                    const v = s[1] && decodeURIComponent(s[1]);
-                    (urlParams[k] = urlParams[k] || []).push(v);
-                });
-            }
-
             // create the camera
             const camera = new pc.Entity();
             camera.addComponent("camera", {
@@ -60,13 +67,18 @@
             // create the entity
             const light = new pc.Entity();
             light.addComponent("light", {
-                type: "point",
+                type: "directional",
                 color: new pc.Color(1, 1, 1),
                 range: 100,
-                castShadows: true
+                castShadows: true,
+                shadowBias: 0.2,
+                shadowDistance: 5,
+                normalOffsetBias: 0.05,
+                shadowResolution: 2048
             });
-            light.translate(5, 0, 15);
+            light.setLocalEulerAngles(45, 30, 0);
             app.root.addChild(light);
+            app.scene.ambientLight = new pc.Color(0.2, 0.2, 0.2);
 
             const update = (ms) => {
                 pc.ComponentSystem.update(ms, false);
@@ -91,6 +103,8 @@
                 camera.lookAt(bbox.center);
                 camera.camera.nearClip = distance / 10;
                 camera.camera.farClip = distance * 10;
+
+                light.light.shadowDistance = distance * 2;
             };
 
             const dataURItoBlob = function(dataURI) {
@@ -148,7 +162,6 @@
                             app.root.addChild(entity);
 
                             // frame 0
-                            console.log('update');
                             update(1.0 / 60.0);
                             render();
 
@@ -158,11 +171,9 @@
                             render();
 
                             // update
-                            console.log('upload');
-                            upload(`${model.name}/${variant}`, urlParams.browser);
+                            upload(`${model.name}/${variant}`, browser);
 
                             // clean up
-                            console.log('cleanup');
                             app.root.removeChild(entity);
                             entity.destroy();
 
