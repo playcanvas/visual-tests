@@ -6,7 +6,7 @@ const crypto = require('crypto');
 class Helpers {
     // extract from a screenshot image path its model, browser, engine and format
     static extractKey = (pathname) => {
-        const bits = pathname.split('/').reverse();
+        const bits = pathname.split(path.sep).reverse();
         return bits[0] === '.DS_Store' ? null : {
             model: bits[2],
             browser: bits[0],
