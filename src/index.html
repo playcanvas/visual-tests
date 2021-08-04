@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gltf Viewer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" type="image/png" href="../playcanvas-favicon.png" />
+    <script src="playcanvas.js"></script>
+    <script src="draco/draco.wasm.js"></script>
+    <style>
+        body { 
+            margin: 0;
+            overflow-y: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- The canvas element -->
+    <canvas id="application-canvas"></canvas>
+
+    <!-- The script -->
+    <script>
+        const run = (modelIndex) => {
+            // load and initialize draco
+            const canvas = document.getElementById("application-canvas");
+
+            // Create the app and start the update loop
+            const app = new pc.Application(canvas);
+            const device = app.graphicsDevice;
+
+            // Set the canvas to fill the window and automatically change resolution to be the same as the canvas size
+            app.setCanvasFillMode(pc.FILLMODE_FILL_WINDOW);
+            app.setCanvasResolution(pc.RESOLUTION_AUTO);
+
+            window.addEventListener("resize", function () {
+                app.resizeCanvas(canvas.width, canvas.height);
+            });
+
+            app.scene.ambientLight = new pc.Color(0.2, 0.2, 0.2);
+
+            // extract query params. taken from https://stackoverflow.com/a/21152762
+            const urlParams = {};
+            if (location.search) {
+                location.search.substr(1).split("&").forEach((item) => {
+                    const s = item.split("=");
+                    const k = s[0];
+                    const v = s[1] && decodeURIComponent(s[1]);
+                    (urlParams[k] = urlParams[k] || []).push(v);
+                });
+            }
+
+            // create the camera
+            const camera = new pc.Entity();
+            camera.addComponent("camera", {
+                clearColor: new pc.Color(0.4, 0.45, 0.5)
+            });
+            app.root.addChild(camera);
+
+            // create the entity
+            const light = new pc.Entity();
+            light.addComponent("light", {
+                type: "point",
+                color: new pc.Color(1, 1, 1),
+                range: 100,
+                castShadows: true
+            });
+            light.translate(5, 0, 15);
+            app.root.addChild(light);
+
+            const update = (ms) => {
+                pc.ComponentSystem.update(ms, false);
+                pc.ComponentSystem.animationUpdate(ms, false);
+                pc.ComponentSystem.postUpdate(ms, false);
+            };
+
+            const render = () => {
+                app.batcher.updateAll();
+                app.renderer.renderComposition(app.scene.layers);
+            };
+
+            const placeCamera = (camera, meshInstances) => {
+                const bbox = new pc.BoundingBox();
+                meshInstances.forEach((mi, i) => {
+                    bbox[i === 0 ? 'copy' : 'add'](mi.aabb);
+                });
+
+                const bboxMax = bbox.getMax();
+                const distance = (bbox.halfExtents.length() * 1.4) / Math.sin(0.5 * camera.camera.fov * camera.camera.aspectRatio * pc.math.DEG_TO_RAD);
+                camera.setPosition(bboxMax.x, bboxMax.y, bbox.center.z + distance);
+                camera.lookAt(bbox.center);
+                camera.camera.nearClip = distance / 10;
+                camera.camera.farClip = distance * 10;
+            };
+
+            const dataURItoBlob = function(dataURI) {
+                var byteString = atob(dataURI.split(',')[1]);
+                var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                var ab = new ArrayBuffer(byteString.length);
+                var dw = new DataView(ab);
+                for(var i = 0; i < byteString.length; i++) {
+                    dw.setUint8(i, byteString.charCodeAt(i));
+                }
+                return new Blob([ab], {type: mimeString});
+            }
+
+            const upload = (test, platform) => {
+                const blob = dataURItoBlob(canvas.toDataURL());
+
+                const formData = new FormData();
+                formData.append('pngimage', blob);
+                formData.append('test', test);
+                formData.append('platform', platform);
+
+                fetch("upload", {
+                    method: "POST",
+                    body: formData,
+                })
+                .then((response) => { });
+            };
+
+            // iterate over all models and variants
+            let mindex = 0;
+            let vindex = 0;
+            const renderNext = () => {
+                if (mindex === modelIndex.length) {
+                    // finished
+                    const doneDiv = document.createElement('div');
+                    doneDiv.id = 'visual-regression-complete';
+                    document.body.appendChild(doneDiv);
+                } else {
+                    const model = modelIndex[mindex];
+                    const vkeys = Object.keys(model.variants);
+                    const variant = vkeys[vindex];
+                    const url = `${model.name}/${variant}/${model.variants[variant]}`;
+
+                    app.assets.loadFromUrl(url, "container", function (err, asset) {
+                        if (err) {
+                            console.log(`error loading model err=${err}`);
+                        } else {
+                            // add the entity to the scene
+                            const entity = new pc.Entity();
+                            entity.addComponent("model", {
+                                type: "asset",
+                                asset: asset.resource.model,
+                                castShadows: true
+                            });
+                            app.root.addChild(entity);
+
+                            // frame 0
+                            console.log('update');
+                            update(1.0 / 60.0);
+                            render();
+
+                            // frame 1
+                            placeCamera(camera, entity?.model?.meshInstances || []);
+                            update();
+                            render();
+
+                            // update
+                            console.log('upload');
+                            upload(`${model.name}/${variant}`, urlParams.browser);
+
+                            // clean up
+                            console.log('cleanup');
+                            app.root.removeChild(entity);
+                            entity.destroy();
+
+                            app.assets.remove(asset);
+                            asset.unload();
+                        }
+
+                        if (++vindex === vkeys.length) {
+                            vindex = 0;
+                            ++mindex;
+                        }
+
+                        renderNext();
+                    });
+                }
+            }
+
+            renderNext();
+        }
+
+        // load and initialize draco
+        const moduleName = 'DracoDecoderModule';
+        const lib = window[moduleName];
+        window[moduleName + 'Lib'] = lib;
+        lib({
+            locateFile: () => 'draco/draco.wasm.wasm'
+        }).then((instance) => {
+            window[moduleName] = instance;
+
+            // load the list of gltf models
+            fetch('model-index.json')
+                .then((response) => response.json())
+                .then((json) => {
+                    // finally, run the application
+                    run(json);
+                });
+        });
+    </script>
+</body>
+</html>

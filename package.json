@@ -1,0 +1,35 @@
+{
+  "name": "engine-visual-testing",
+  "version": "1.0.0",
+  "description": "Visual regression test for the PlayCanvas engine",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf screenshots",
+    "gen:stable": "node src/gen.js https://code.playcanvas.com/playcanvas-stable.js screenshots/stable 8081",
+    "gen:latest": "node src/gen.js https://code.playcanvas.com/playcanvas-latest.js screenshots/latest 8081",
+    "gen:local": "node src/gen.js http://localhost:8080/build/playcanvas.js screenshots/local 8081",
+    "gen:report": "node src/diff.js screenshots/stable screenshots/latest screenshots/report.html",
+    "gen:local-report": "node src/diff.js screenshots/stable screenshots/local screenshots/local-report.html",
+    "test": "npm run clean && npm run gen:stable && npm run gen:latest && npm run gen:report",
+    "test-local": "npm run clean && npm run gen:stable && npm run gen:local && npm run gen:local-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@wdio/cli": "^7.9.0",
+    "bent": "^7.0.0",
+    "chai": "^4.2.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "pngjs": "^6.0.0",
+    "rimraf": "^3.0.0"
+  },
+  "devDependencies": {
+    "@wdio/local-runner": "^7.9.0",
+    "@wdio/mocha-framework": "^7.9.0",
+    "@wdio/selenium-standalone-service": "^7.8.0",
+    "@wdio/spec-reporter": "^7.9.0"
+  }
+}
