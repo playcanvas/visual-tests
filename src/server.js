@@ -8,13 +8,13 @@ class Server {
         const app = express();
 
         // serve static files
+        app.use('/', express.static('./glTF-Sample-Models/2.0/'));
         app.use('/index.html', express.static('./src/index.html'));
         app.use('/draco', express.static('./draco'));
         app.use('/playcanvas.js', (req, res, next) => {
             res.type('.js');
             res.send(engineSource);
         });
-        app.use('/', express.static('./glTF-Sample-Models/2.0/'));
 
         // support file upload
         app.use(fileupload());
@@ -55,6 +55,8 @@ class Server {
         });
 
         this.server = app.listen(port);
+
+        console.log(`server is up on port=${port}`);
     }
 
     close() {

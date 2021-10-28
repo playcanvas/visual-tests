@@ -43,9 +43,11 @@ const spawnPuppeteer = (port, doneCallback) => {
         ]
     }).then(async (browser) => {
         const page = await browser.newPage();
-        // page.on('console', (message) => {
-        //     console.log(`> ${message.text()}`);
-        // });
+
+        page.on('console', (message) => {
+            console.log(`> ${message.text()}`);
+        });
+
         await page.goto(`http://localhost:${port}/index.html`);
         await page.waitForSelector('#visual-regression-complete', {
             timeout: 1000 * 60 * 5
@@ -59,11 +61,13 @@ const spawnBrowser = (port, doneCallback) => {
     // use the HARNESS environment variable to select PUPPETEER or WDIO.
     // if the environment variable isn't specified default to puppetter on all
     // platforms except mac.
-    const usePuppeteer = process.env.HARNESS ? (process.env.HARNESS === 'PUPPETEER') : (process.platform !== 'darwin');
-    if (usePuppeteer) {
-        spawnPuppeteer(port, doneCallback);
-    } else {
+    const useWdio = process.env.USE_WDIO === '1';
+    if (useWdio) {
+        console.log('starting wdio...');
         spawnWdio(port, doneCallback);
+    } else {
+        console.log('starting puppeteer...');
+        spawnPuppeteer(port, doneCallback);
     }
 };
 

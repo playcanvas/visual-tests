@@ -75,9 +75,9 @@
             app.scene.ambientLight = new pc.Color(0.2, 0.2, 0.2);
 
             const update = (ms) => {
-                pc.ComponentSystem.update(ms, false);
-                pc.ComponentSystem.animationUpdate(ms, false);
-                pc.ComponentSystem.postUpdate(ms, false);
+                app.systems.fire('update', ms);
+                app.systems.fire('animationUpdate', ms);
+                app.systems.fire('postUpdate', ms);
             };
 
             const render = () => {
