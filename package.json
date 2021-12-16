@@ -8,11 +8,14 @@
     "clean": "rimraf screenshots",
     "gen:stable": "node src/gen.js https://code.playcanvas.com/playcanvas-stable.js screenshots/stable 8081",
     "gen:preview": "node src/gen.js https://code.playcanvas.com/playcanvas-preview.js screenshots/preview 8081",
+    "gen:latest": "node src/gen.js https://code.playcanvas.com/playcanvas-latest.js screenshots/latest 8081",
     "gen:local": "node src/gen.js http://localhost:8080/build/playcanvas.js screenshots/local 8081",
-    "gen:report": "node src/diff.js screenshots/report.html screenshots/stable screenshots/preview",
-    "gen:local-report": "node src/diff.js screenshots/local-report.html screenshots/stable screenshots/local",
-    "test": "npm run clean && npm run gen:stable && npm run gen:preview && npm run gen:report",
-    "test-local": "npm run clean && npm run gen:stable && npm run gen:local && npm run gen:local-report"
+    "report": "node src/report.js screenshots/report.html screenshots/stable screenshots/preview",
+    "report:latest": "node src/report.js screenshots/report.html screenshots/stable screenshots/latest",
+    "report:local": "node src/report.js screenshots/report.html screenshots/stable screenshots/local",
+    "test": "npm run clean && npm run gen:stable && npm run gen:preview && npm run report",
+    "test:latest": "npm run clean && npm run gen:stable && npm run gen:latest && npm run report:latest",
+    "test:local": "npm run clean && npm run gen:stable && npm run gen:local && npm run report:local"
   },
   "keywords": [],
   "author": "",

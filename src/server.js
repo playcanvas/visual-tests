@@ -9,7 +9,7 @@ class Server {
 
         // serve static files
         app.use('/', express.static('./glTF-Sample-Models/2.0/'));
-        app.use('/index.html', express.static('./src/index.html'));
+        app.use('/', express.static('./src/test-client/'));
         app.use('/draco', express.static('./draco'));
         app.use('/playcanvas.js', (req, res, next) => {
             res.type('.js');
