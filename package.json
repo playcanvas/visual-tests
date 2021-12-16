@@ -9,7 +9,7 @@
     "gen:stable": "node src/gen.js https://code.playcanvas.com/playcanvas-stable.js screenshots/stable 8081",
     "gen:preview": "node src/gen.js https://code.playcanvas.com/playcanvas-preview.js screenshots/preview 8081",
     "gen:latest": "node src/gen.js https://code.playcanvas.com/playcanvas-latest.js screenshots/latest 8081",
-    "gen:local": "node src/gen.js http://localhost:8080/build/playcanvas.js screenshots/local 8081",
+    "gen:local": "node src/gen.js http://localhost:8080/playcanvas.js screenshots/local 8081",
     "report": "node src/report.js screenshots/report.html screenshots/stable screenshots/preview",
     "report:latest": "node src/report.js screenshots/report.html screenshots/stable screenshots/latest",
     "report:local": "node src/report.js screenshots/report.html screenshots/stable screenshots/local",

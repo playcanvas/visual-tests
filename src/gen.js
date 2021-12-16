@@ -37,7 +37,7 @@ const spawnWdio = (port, doneCallback) => {
 // spawn chrome browser
 const spawnPuppeteer = (port, doneCallback) => {
     puppeteer.launch({
-        devtools: false,
+        devtools: process.env.DEVTOOLS === '1',
         args: [
             // see list of args at https://peter.sh/experiments/chromium-command-line-switches/
         ]

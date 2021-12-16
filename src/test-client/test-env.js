@@ -173,7 +173,7 @@ class TestEnv {
         this.app.renderer.renderComposition(this.app.scene.layers);
     }
 
-    placeCamera(meshInstances) {
+    frame(meshInstances) {
         const bbox = new pc.BoundingBox();
         meshInstances.forEach((mi, i) => {
             bbox[i === 0 ? 'copy' : 'add'](mi.aabb);
@@ -214,4 +214,17 @@ class TestEnv {
         })
         .then((response) => { });
     };
+
+    add(entity) {
+        this.app.root.addChild(entity);
+    }
+
+    remove(entity) {
+        this.app.root.removeChild(entity);
+    }
+};
+
+
+export {
+    TestEnv
 };

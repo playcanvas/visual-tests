@@ -13,11 +13,6 @@
     </style>
     <script src="playcanvas.js"></script>
     <script src="draco/draco.wasm.js"></script>
-    <script src="./test-env.js"></script>
-    <script>
-        const testList = [];
-    </script>
-    <script src="./gltf-tests.js"></script>
 </head>
 
 <body>
@@ -25,29 +20,6 @@
     <canvas id="application-canvas"></canvas>
 
     <!-- The script -->
-    <script>
-        // load and initialize draco
-        const moduleName = 'DracoDecoderModule';
-        window[moduleName]({
-            locateFile: () => 'draco/draco.wasm.wasm'
-        }).then((instance) => {
-            window[moduleName] = instance;
-
-            const doneCallback = () => {
-                const doneDiv = document.createElement('div');
-                doneDiv.id = 'visual-regression-complete';
-                document.body.appendChild(doneDiv);
-            };
-
-            const testEnv = new TestEnv(() => {
-                // run through tests
-                let i = 0;
-                const runNextTest = () => {
-                    testList[i++](testEnv, (i < testList.length - 1) ? () => runNextTest() : doneCallback);
-                };
-                runNextTest();
-            });
-        });
-    </script>
+    <script src="index.js" type="module"></script>
 </body>
 </html>
