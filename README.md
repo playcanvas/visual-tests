@@ -1,4 +1,4 @@
-# gltf-test
+# visual-tests
 
 Generate screenshots of GLTF models and compare them across engine releases and/or GLTF variants.
 
