@@ -8,9 +8,10 @@ class Server {
         const app = express();
 
         // serve static files
-        app.use('/', express.static('./glTF-Sample-Models/2.0/'));
+        app.use('/', express.static('./gltf-sample-models/2.0/'));
         app.use('/', express.static('./src/test-client/'));
         app.use('/draco', express.static('./draco'));
+        app.use('/basis', express.static('./basis'));
         app.use('/playcanvas.js', (req, res, next) => {
             res.type('.js');
             res.send(engineSource);

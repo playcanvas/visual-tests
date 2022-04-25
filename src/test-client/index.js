@@ -9,6 +9,13 @@ const testList = [
     gltfTests
 ];
 
+pc.basisInitialize({
+    glueUrl: 'basis/basis.wasm.js',
+    wasmUrl: 'basis/basis.wasm.wasm',
+    fallbackUrl: 'basis/basis.js',
+    lazyInit: true
+});
+
 // load and initialize draco
 const moduleName = 'DracoDecoderModule';
 window[moduleName]({

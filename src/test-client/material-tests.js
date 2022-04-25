@@ -33,7 +33,8 @@ class MaterialTest {
     frame(n) {
         for (let i = 0; i < 8; ++i) {
             for (let j = 0; j < 8; ++j) {
-                const material = this.createMaterial(this.permutation.resolve(this.idx++));
+                const config = this.permutation.resolve(this.idx++);
+                const material = this.createMaterial(config);
                 const sphere = this.createSphere(material, {
                     x: i - 3.5,
                     y: j - 3.5,

@@ -81,9 +81,9 @@ class TestEnv {
             // old (pre-1.51) lighting
             const app = this.app;
             const device = app.graphicsDevice;
-    
+
             const cubemaps = [];
-    
+
             const reprojectToCubemap = (src, size) => {
                 // generate faces cubemap
                 const faces = new pc.Texture(device, {
@@ -98,10 +98,10 @@ class TestEnv {
                     mipmaps: false
                 });
                 pc.reprojectTexture(src, faces);
-    
+
                 return faces;
             };
-    
+
             if (texture.cubemap) {
                 // @ts-ignore TODO type property missing from pc.Texture
                 if (texture.type === pc.TEXTURETYPE_DEFAULT || texture.type === pc.TEXTURETYPE_RGBM) {
@@ -117,7 +117,7 @@ class TestEnv {
                 // reproject equirect to cubemap for skybox
                 cubemaps.push(reprojectToCubemap(texture, texture.width / 4));
             }
-    
+
             // generate prefiltered lighting data
             const sizes = [128, 64, 32, 16, 8, 4];
             const specPower = [1, 512, 128, 32, 8, 2];
@@ -133,15 +133,15 @@ class TestEnv {
                     fixCubemapSeams: true,
                     mipmaps: false
                 });
-    
+
                 pc.reprojectTexture(cubemaps[1] || texture, prefilter, {
                     numSamples: 4096,
                     specularPower: specPower[i]
                 });
-    
+
                 cubemaps.push(prefilter);
             }
-    
+
             // assign the textures to the scene
             app.scene.skyboxRotation.setFromEulerAngles(0, 90, 0);
             app.scene.setSkybox(cubemaps);
@@ -223,7 +223,6 @@ class TestEnv {
         this.app.root.removeChild(entity);
     }
 };
-
 
 export {
     TestEnv
