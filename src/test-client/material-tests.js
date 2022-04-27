@@ -142,7 +142,7 @@ class MaterialTest {
     }
 }
 
-const materialTests = (testEnv, doneCallback) => {
+const materialTests = async () => {
     const assetLoader = new AssetLoader(testEnv.app.assets);
     const test = new MaterialTest(testEnv);
     assetLoader.load(test.manifest, (err, assets) => {
@@ -170,8 +170,6 @@ const materialTests = (testEnv, doneCallback) => {
 
         // destroy assets
         assetLoader.destroy();
-
-        doneCallback();
     });
 }
 
