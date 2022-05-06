@@ -8,10 +8,18 @@ class TestServer {
     constructor(port, testRegistry, htmlTemplate) {
         const app = express();
 
+        const indexHtml = this.renderIndexHtml(testRegistry, htmlTemplate);
+
         // return test data based on referrer id
         app.use('/test/test.json', (req, res, next) => {
             const urlParts = url.parse(req.get('Referer'), true);
-            res.json(testRegistry.getTest(urlParts.query.id) || {});
+
+            const test = Object.assign(
+                {},
+                testRegistry.getTest(urlParts.query.id) || {},
+                urlParts.query);
+
+            res.json(test);
         });
 
         // tests map to public directory
@@ -19,14 +27,7 @@ class TestServer {
 
         // base maps to index.html listing tests
         app.use('/', (req, res, next) => {
-            const htmlTestEntries = testRegistry.getIndex().map((index) => {
-                return `<tr><th><a href="/test?id=${index}">${index}</a></th></tr>`
-            }).join('\n');
-
-            const bodyContent = `<table>${htmlTestEntries}\n</table>\n`;
-
-            // generate index.html
-            res.send(htmlTemplate.replace('$BODY_CONTENT', bodyContent));
+            res.send(indexHtml);
         });
 
         // debug output missed files
@@ -42,6 +43,17 @@ class TestServer {
     close() {
         this.server.close();
     }
+
+    renderIndexHtml(testRegistry, htmlTemplate) {
+        const htmlTestEntries = testRegistry.getIndex().map((index) => {
+            return `<tr><th><a href="/test?id=${index}">${index}</a></th></tr>`
+        }).join('\n');
+    
+        const bodyContent = `<table>${htmlTestEntries}\n</table>\n`;
+    
+        // generate index.html
+        return htmlTemplate.replace('$BODY_CONTENT', bodyContent);
+    }    
 }
 
 export {

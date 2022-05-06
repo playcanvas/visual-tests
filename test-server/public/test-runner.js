@@ -79,6 +79,10 @@ const init = async (testData) => {
 const createApp = (testData) => {
     // create the test canvas
     const canvas = document.createElement('canvas');
+    canvas.style.cursor = 'pointer';
+    canvas.addEventListener('click', () => {
+        window.location.href = "/home";
+    });
     document.body.appendChild(canvas);
 
     // create the app and start the update loop
