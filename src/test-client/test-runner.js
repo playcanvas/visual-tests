@@ -31,7 +31,7 @@ const isString = (v) => {
     return v && ((typeof v === 'string') || (v instanceof String));
 };
 
-class TestEnv {
+class TestRunner {
     constructor() {
         this.platform = getBrowser();
 
@@ -48,7 +48,7 @@ class TestEnv {
         this.device = this.app.graphicsDevice;
 
         // fix canvas resolution
-        this.app.setCanvasResolution(pc.RESOLUTION_FIXED, 800, 600);
+        this.app.setCanvasResolution(pc.RESOLUTION_FIXED, 1280, 720);
 
         // gamma correction
         this.app.scene.gammaCorrection = pc.GAMMA_SRGB;
@@ -79,7 +79,41 @@ class TestEnv {
     }
 
     async init() {
+        await this.loadFont();
         await this.initEnvLighting();
+    }
+
+    async loadFont() {
+        const asset = new pc.Asset('test_font', 'font', {
+            url: '/assets/Inconsolata-Regular.json'
+        });
+        this.app.assets.add(asset);
+        await loadAsset(asset);
+
+        const screen = new pc.Entity();
+        screen.addComponent('screen', {
+            referenceResolution: new pc.Vec2(1280, 720),
+            scaleBlend: 0.5,
+            scaleMode: pc.SCALEMODE_BLEND,
+            screenSpace: true
+        });
+        this.app.root.addChild(screen);
+
+        const label = new pc.Entity();
+        label.setLocalPosition(0, -300, 0);
+        label.addComponent('element', {
+            pivot: new pc.Vec2(0.5, 0.5),
+            anchor: new pc.Vec4(0.5, 0.5, 0.5, 0.5),
+            fontAsset: asset.id,
+            fontSize: 42,
+            text: "Basic Text",
+            type: pc.ELEMENTTYPE_TEXT
+        });
+        screen.addChild(label);
+
+        this.font = asset.resource;
+        this.screen = screen;
+        this.label = label;
     }
 
     async initEnvLighting() {
@@ -173,7 +207,12 @@ class TestEnv {
     // create resources of the given test
     // stage has the following structure:
     // {
-    //    frame: string (upload name),
+    //    name: string (upload name),
+    //
+    //    engine: string (url)
+    //
+    //    env: string (url)
+    // 
     //    assets: [{
     //        name: string,
     //        type: 'texture', 'container',
@@ -194,6 +233,9 @@ class TestEnv {
     //        eulerAngles: [x, y, z]
     //        scale: [x, y, z],
     //    }]
+    //
+    //    children: [stage, stage...]
+    //
     // }
     async createResources(stage, parentResourceContext) {
         const resourceContext = {
@@ -348,5 +390,5 @@ class TestEnv {
 };
 
 export {
-    TestEnv
+    TestRunner
 };

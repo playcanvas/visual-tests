@@ -3,8 +3,8 @@ import { AssetLoader } from "./asset-loader.js";
 import { Permutation } from "./permutation.js";
 
 class MaterialTest {
-    constructor(testEnv) {
-        this.testEnv = testEnv;
+    constructor(testRunner) {
+        this.testRunner = testRunner;
         this.materials = [];
         this.entities = [];
     }
@@ -22,10 +22,10 @@ class MaterialTest {
         this.permutation = this.createPermutation(assets);
         this.idx = 0;
 
-        this.testEnv.camera.setPosition(0, 0, 10);
-        this.testEnv.camera.lookAt(0, 0, 0);
-        this.testEnv.camera.camera.nearClip = 0.1;
-        this.testEnv.camera.camera.farClip = 1000;
+        this.testRunner.camera.setPosition(0, 0, 10);
+        this.testRunner.camera.lookAt(0, 0, 0);
+        this.testRunner.camera.camera.nearClip = 0.1;
+        this.testRunner.camera.camera.farClip = 1000;
 
         return Math.ceil(this.permutation.total / 64);
     }
@@ -40,7 +40,7 @@ class MaterialTest {
                     y: j - 3.5,
                     z: 0
                 });
-                this.testEnv.add(sphere);
+                this.testRunner.add(sphere);
                 this.materials.push(material);
                 this.entities.push(sphere);
             }
@@ -49,7 +49,7 @@ class MaterialTest {
 
     cleanup(n) {
         this.entities.forEach((entity) => {
-            this.testEnv.remove(entity);
+            this.testRunner.remove(entity);
             entity.destroy();
         });
         this.materials.forEach((material) => {
@@ -143,8 +143,8 @@ class MaterialTest {
 }
 
 const materialTests = async () => {
-    const assetLoader = new AssetLoader(testEnv.app.assets);
-    const test = new MaterialTest(testEnv);
+    const assetLoader = new AssetLoader(testRunner.app.assets);
+    const test = new MaterialTest(testRunner);
     assetLoader.load(test.manifest, (err, assets) => {
         // prepare
         const totalFrames = test.prepare(assets);
@@ -154,15 +154,15 @@ const materialTests = async () => {
             test.frame(frame);
 
             // frame 0
-            testEnv.update(1.0 / 60.0);
-            testEnv.render();
+            testRunner.update(1.0 / 60.0);
+            testRunner.render();
 
             // frame 1
-            testEnv.update();
-            testEnv.render();
+            testRunner.update();
+            testRunner.render();
 
             // upload screenshot
-            testEnv.upload(`engineMaterials/page_${frame}`);
+            testRunner.upload(`engineMaterials/page_${frame}`);
 
             // test cleanup
             test.cleanup(frame);

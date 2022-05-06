@@ -1,5 +1,5 @@
 
-import { TestEnv } from "./test-env.js";
+import { TestRunner } from "./test-runner.js";
 import { gltfTests } from "./gltf-tests.js";
 import { materialTests } from "./material-tests.js";
 
@@ -98,13 +98,13 @@ const main = async () => {
         test
     ].flat();
 
-    // create test environment
-    const testEnv = new TestEnv();
-    await testEnv.init();
+    // create test runner
+    const testRunner = new TestRunner();
+    await testRunner.init();
 
     // run tests
     for (let i = 0; i < tests.length; ++i) {
-        await testEnv.evaluateTest(tests[i]);
+        await testRunner.evaluateTest(tests[i]);
     }
 
     // add named div so testing harness knows tests are complete
