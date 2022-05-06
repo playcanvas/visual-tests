@@ -1,0 +1,44 @@
+{
+    "name": "test/material",
+
+    "engine": "https://code.playcanvas.com/playcanvas-stable.js",
+
+    "env": "assets/abandoned_tank_farm_01_2k.hdr",
+
+    "assets": [{
+        "name": "normal",
+        "type": "texture",
+        "url": "assets/flakes5n.png"
+    }, {
+        "name": "diffuse",
+        "type": "texture",
+        "url": "assets/flakes5c.png"
+    }, {
+        "name": "other",
+        "type": "texture",
+        "url": "assets/flakes5o.png"
+    }],
+
+    "materials": [{
+        "name": "mat",
+        "options": {
+            "diffuseMap": "$diffuse",
+            "metalnessMap": "$other",
+            "metalnessMapChannel": "r",
+            "glossMap": "$other",
+            "glossMapChannel": "g",
+            "normalMap": "$normal",
+            "useMetalness": true,
+            "shininess": 100
+        }
+    }],
+
+    "entities": [{
+        "name": "sphere",
+        "componentType": "render",
+        "componentOptions": {
+            "type": "sphere",
+            "material": "$mat"
+        }
+    }]
+}

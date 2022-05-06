@@ -1,0 +1,30 @@
+{
+    "name": "test/avo",
+
+    "engine": "https://code.playcanvas.com/playcanvas-stable.js",
+
+    "basis": {
+        "glueUrl": "basis/basis.wasm.js",
+        "wasmUrl": "basis/basis.wasm.wasm",
+        "fallbackUrl": "basis/basis.js",
+        "lazyInit": true
+    },
+
+    "draco": "draco/draco.wasm.js",
+
+    "env": "assets/abandoned_tank_farm_01_2k.hdr",
+
+    "assets": [{
+        "name": "avo",
+        "type": "container",
+        "url": "assets/Avocado.glb"
+    }],
+
+    "entities": [{
+        "name": "avo",
+        "asset": "$avo",
+        "position": [0, 0, 0],
+        "eulerAngles": [15, 30, 45],
+        "scale": [3, 2, 1]
+    }]
+}
