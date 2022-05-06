@@ -1,1 +1,4 @@
 
+[submodule "test-server/public/gltf-sample-models"]
+	path = test-server/public/gltf-sample-models
+	url = https://github.com/KhronosGroup/glTF-Sample-Models.git
