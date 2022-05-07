@@ -12,7 +12,7 @@ class GltfTests {
             Object.keys(model.variants).forEach((variant) => {
                 const name = `${model.name}/${variant}/${model.variants[variant]}`;
                 testRegistry.register({
-                    name: `gltf/${name}`,
+                    id: `gltf/${name}`,
                     engine: "https://code.playcanvas.com/playcanvas-stable.js",
                     draco: "draco/draco.wasm.js",
                     env: "assets/abandoned_tank_farm_01_2k.hdr",

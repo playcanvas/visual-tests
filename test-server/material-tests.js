@@ -64,7 +64,7 @@ class MaterialTests {
 
         for (let frame = 0; frame < totalFrames; ++frame) {
             const test = {
-                name: `material/${frame}`,
+                id: `material/${frame}`,
                 engine: "https://code.playcanvas.com/playcanvas-stable.js",
                 env: "assets/abandoned_tank_farm_01_2k.hdr",
                 assets: [{

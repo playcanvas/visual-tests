@@ -22,6 +22,11 @@ class TestServer {
             res.json(test);
         });
 
+        // get the list of tests
+        app.use('/index.json', (req, res, next) => {
+            res.json(testRegistry.getIndex());
+        });
+
         // tests map to public directory
         app.use('/test', express.static(`${__dirname}/public`));
 

@@ -5,7 +5,7 @@ class TestRegistry {
     }
 
     register(test) {
-        this.tests[test.name] = test;
+        this.tests[test.id] = test;
     }
 
     getIndex() {

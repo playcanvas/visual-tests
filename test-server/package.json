@@ -6,7 +6,7 @@
     "type": "module",
     "main": "index.js",
     "scripts": {
-        "run": "node index.js"
+        "serve": "node index.js"
     },
     "keywords": [],
     "author": "",

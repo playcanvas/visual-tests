@@ -67,7 +67,6 @@ const init = async (testData) => {
 
     // initialize engine, draco
     await Promise.all(promises);
-    console.log(pc.version);
 
     // initialize basis
     if (testData.basis) {
@@ -267,35 +266,6 @@ const frame = (context) => {
     context.light.light.shadowDistance = distance * 2;
 };
 
-const send = (url, canvas) => {
-    const dataURItoBlob = (dataURI) => {
-        const byteString = atob(dataURI.split(',')[1]);
-        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const dw = new DataView(ab);
-        for(let i = 0; i < byteString.length; i++) {
-            dw.setUint8(i, byteString.charCodeAt(i));
-        }
-        return new Blob([ab], {type: mimeString});
-    };
-
-    const ua = navigator.userAgent;
-    const browser =
-        ua.indexOf("Chrome") != -1 ? 'chrome' :
-        (ua.indexOf("Safari") != -1 ? 'safari' :
-        (ua.indexOf("Firefox") != -1 ? 'firefox' : 'unknown'));
-
-    const blob = dataURItoBlob(canvas.toDataURL());
-    const formData = new FormData();
-    formData.append('pngimage', blob);
-    formData.append('platform', browser);
-
-    return fetch(url, {
-        method: "POST",
-        body: formData,
-    });
-};
-
 const createLabel = (text, root, resources) => {
     const screen = new pc.Entity();
     screen.addComponent('screen', {
@@ -320,6 +290,38 @@ const createLabel = (text, root, resources) => {
     screen.addChild(label);
 
     return screen;
+};
+
+const send = (url, id, canvas) => {
+    const dataURItoBlob = (dataURI) => {
+        const byteString = atob(dataURI.split(',')[1]);
+        const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const dw = new DataView(ab);
+        for(let i = 0; i < byteString.length; i++) {
+            dw.setUint8(i, byteString.charCodeAt(i));
+        }
+        return new Blob([ab], {type: mimeString});
+    };
+
+    const ua = navigator.userAgent;
+    const browser =
+        ua.indexOf("Chrome") != -1 ? 'chrome' :
+        (ua.indexOf("Safari") != -1 ? 'safari' :
+        (ua.indexOf("Firefox") != -1 ? 'firefox' : 'unknown'));
+
+    const blob = dataURItoBlob(canvas.toDataURL());
+    const formData = new FormData();
+    formData.append('pngimage', blob);
+    formData.append('id', id);
+    formData.append('browser', browser);
+    formData.append('pc-version', pc.version);
+    formData.append('pc-revision', pc.revision);
+
+    return fetch(url, {
+        method: "POST",
+        body: formData
+    });
 };
 
 const runTest = async (testData) => {
@@ -367,14 +369,18 @@ const runTest = async (testData) => {
 
     if (testData.send) {
         // upload screenshot
-        await send(testData.send, context.canvas);
+        const result = await send(testData.send, testData.id, context.canvas);
 
-        // add named div so testing harness knows tests are complete
-        const doneDiv = document.createElement('div');
-        doneDiv.id = 'visual-regression-complete';
-        document.body.appendChild(doneDiv);
+        if (result.ok) {
+            // add named div so testing harness knows tests are complete
+            const doneDiv = document.createElement('div');
+            doneDiv.id = 'visual-regression-complete';
+            document.body.appendChild(doneDiv);
 
-        console.log('done');
+            console.log('done');
+        } else {
+            console.log(`upload failed result=${result}`);
+        }
     } else {
         // continue rendering ad infinitum
         const animationFrame = () => {
